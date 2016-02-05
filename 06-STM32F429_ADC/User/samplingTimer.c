@@ -1,8 +1,11 @@
 #include "samplingTimer.h"
 #include "stm32f4xx_tim.h"
 #include "tm_stm32f4_adc.h"
+#include "tm_stm32f4_usart.h"
 #include "stm32f4xx.h"
 
+ADC_values_t ADC_values;
+TDSC_crossings_t TDSC_crossings;
 
 TIM_TimeBaseInitTypeDef TIM_timeBaseStructure;
 NVIC_InitTypeDef nvicStructure;
@@ -60,16 +63,61 @@ void timer_init() {
   * Returns: void  */ 
 void TIM2_IRQHandler(void) {
 	uint32_t read;
+	char str[15];
 	
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 		// GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
 		read = TM_ADC_Read(ADC1, ADC_Channel_0);
-		if (read > 2000){
-			GPIO_SetBits(GPIOA, GPIO_Pin_5);
+		TDSC_adjustValues(read);
+		if (read > 2000 && TDSC_crossings.positive == 0){
+			TDSC_crossings.positive = 1;
+			TDSC_crossings.collection[TDSC_crossings.length] = TDSC_crossings.crossings;
+			TDSC_crossings.crossings = 0;
+			TDSC_crossings.length++;
+			//GPIO_SetBits(GPIOA, GPIO_Pin_5);
 		}
-		else{
-			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+		else if (read < 2000 && TDSC_crossings.positive == 1){
+			TDSC_crossings.positive = 0;
+			TDSC_crossings.collection[TDSC_crossings.length] = TDSC_crossings.crossings;
+			TDSC_crossings.crossings = 0;
+			TDSC_crossings.length++;
+			//GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 		}
+		else if (TDSC_crossings.positive && TDSC_positiveMinima()){
+			TDSC_crossings.crossings++;
+		}
+		else if (!TDSC_crossings.positive && TDSC_negativeMinima()){
+			TDSC_crossings.crossings++;
+		}
+	}
+}
+
+void TDSC_init(){
+	ADC_values.prev = ADC_values.current = ADC_values.next = 0;
+	TDSC_crossings.crossings = TDSC_crossings.positive = TDSC_crossings.prev = TDSC_crossings.length = 0;
+}
+
+void TDSC_adjustValues(uint16_t adcRead){
+	ADC_values.prev = ADC_values.current;
+	ADC_values.current = ADC_values.next;
+	ADC_values.next = adcRead;
+}
+
+uint8_t TDSC_positiveMinima(){
+	if (ADC_values.current < ADC_values.next && ADC_values.current < ADC_values.prev){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}
+
+uint8_t TDSC_negativeMinima(){
+	if (ADC_values.current > ADC_values.next && ADC_values.current > ADC_values.prev){
+		return 1;
+	}
+	else{
+		return 0;
 	}
 }

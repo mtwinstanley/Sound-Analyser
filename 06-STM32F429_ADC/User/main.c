@@ -52,6 +52,7 @@ int main(void) {
 	
 	GPIO_Init(GPIOA, &GPIO_InitDef);
 
+	TDSC_init();
 	timer_init();
 	
 	sprintf(str, "START @%d\n\r", SystemCoreClock);
@@ -61,9 +62,17 @@ int main(void) {
 			//low = TM_ADC_Read(ADC1, ADC_Channel_0);
 	while (1) {
 		/* 							Read ADC1 Channel0					Read ADC1 Channel3 */
-		sprintf(str, "%4d\n\r", TM_ADC_Read(ADC1, ADC_Channel_0));//, TM_ADC_Read(ADC1, ADC_Channel_3));
-		TM_USART_Puts(USART1, str);
-		
+		//sprintf(str, "%4d\n\r", TM_ADC_Read(ADC1, ADC_Channel_0));//, TM_ADC_Read(ADC1, ADC_Channel_3));
+		//TM_USART_Puts(USART1, str);
+		if (TDSC_crossings.length > 200){
+			int i;
+			for (i = 0; i < TDSC_crossings.length; i++){
+				sprintf(str, "%4d", TDSC_crossings.collection[i]);
+				TM_USART_Puts(USART1, str);
+			}
+				sprintf(str, "\n\r");
+				TM_USART_Puts(USART1, str);
+		}
 		
 //		read = TM_ADC_Read(ADC1, ADC_Channel_0);
 //		if (low > read && read != 0){
