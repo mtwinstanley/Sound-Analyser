@@ -54,6 +54,8 @@ void samplingTimer_init() {
 	nvicStructure.NVIC_IRQChannelSubPriority = 1;
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
+	// Set the priority of the interrupt to lower than the LPF timer as it takes longer to execute
+	NVIC_SetPriority(TIM2_IRQn, 10);
 }
 
 /**

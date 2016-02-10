@@ -18,6 +18,7 @@
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_adc.h"
 #include "samplingTimer.h"
+#include "LPFClock.h"
 #include <stdio.h>
 
 int main(void) {
@@ -43,7 +44,7 @@ int main(void) {
 
 	TDSC_init();
 	samplingTimer_init();
-	
+	LPFClock_init();
 	sprintf(str, "START @%d\n\r", SystemCoreClock);
 			/* Put to USART */
 			TM_USART_Puts(USART1, str);
