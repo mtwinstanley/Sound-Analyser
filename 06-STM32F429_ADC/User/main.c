@@ -23,9 +23,6 @@
 
 int main(void) {
 	char str[15];
-	uint16_t high = 0;
-	uint16_t low = 3000;
-	uint16_t read;
 	
 	/* Initialize system */
 	SystemInit();
