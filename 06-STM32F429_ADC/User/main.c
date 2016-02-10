@@ -26,8 +26,6 @@ int main(void) {
 	uint16_t low = 3000;
 	uint16_t read;
 	
-	GPIO_InitTypeDef GPIO_InitDef;
-	
 	/* Initialize system */
 	SystemInit();
 	
@@ -42,18 +40,9 @@ int main(void) {
 	
 	/* Initialize ADC1 on channel 3, this is pin PA3 */
 	//TM_ADC_Init(ADC1, ADC_Channel_3);
-	
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	
-	GPIO_InitDef.GPIO_Pin = GPIO_Pin_5;
-	GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitDef.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitDef.GPIO_Speed = GPIO_Speed_50MHz;
-	
-	GPIO_Init(GPIOA, &GPIO_InitDef);
 
 	TDSC_init();
-	timer_init();
+	samplingTimer_init();
 	
 	sprintf(str, "START @%d\n\r", SystemCoreClock);
 			/* Put to USART */

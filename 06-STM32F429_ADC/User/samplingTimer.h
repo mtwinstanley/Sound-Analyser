@@ -1,5 +1,5 @@
-#ifndef _TIMER_H
-#define _TIMER_H
+#ifndef _SAMPLINGTIMER_H
+#define _SAMPLINGTIMER_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -22,11 +22,11 @@ extern ADC_values_t ADC_values;
 extern TDSC_crossings_t TDSC_crossings;
 
 /* Function Prototypes */
-void timer_init(void);
+void samplingTimer_init(void);
 void TDSC_adjustValues(uint16_t adcRead);
 
 void TDSC_init(void);
 uint8_t TDSC_positiveMinima(void);
 uint8_t TDSC_negativeMinima(void);
 
-#endif /* _TIMER_H */
+#endif /* _SAMPLINGTIMER_H */

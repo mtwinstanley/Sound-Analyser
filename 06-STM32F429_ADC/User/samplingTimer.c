@@ -18,7 +18,7 @@ NVIC_InitTypeDef nvicStructure;
   *              This was written using the STM32 Family Reference Manual Rev 11 Pages (183-187), (373-390) and (582-641) 
   * Arguments: void
   * Returns: void  */   
-void timer_init() {
+void samplingTimer_init() {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);							// Enable Clock for Timer 2
 	/* Timer 2 is connected to APB1, which runs at 42MHz
 		 Timer has internal PLL, which doubles this to 84MHz for use in the timer
@@ -33,10 +33,10 @@ void timer_init() {
 	/* Set timer period for when to reset
 		 This uses a similar equation as the prescaler
 		 period = tick_frequency / frequency +1
-		 To get a 48kHz sampling rate: period = 84MHz / 48kHz + 1 = 1750 - 1
+		 To get a 48kHz sampling rate: period = 84MHz / 48kHz + 1 = 1751
 		 stored as a value - 1 so that it is easily re-configurable for different sample rates
 	*/
-	TIM_timeBaseStructure.TIM_Period = 1750 - 1; // 48kHz
+	TIM_timeBaseStructure.TIM_Period = 1751; // 48kHz
 	TIM_timeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_timeBaseStructure.TIM_RepetitionCounter = 0;
 	// Initialise Timer 2
@@ -63,11 +63,9 @@ void timer_init() {
   * Returns: void  */ 
 void TIM2_IRQHandler(void) {
 	uint32_t read;
-	char str[15];
 	
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-		// GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
 		read = TM_ADC_Read(ADC1, ADC_Channel_0);
 		TDSC_adjustValues(read);
 		if (read > 2000 && TDSC_crossings.positive == 0){
@@ -75,14 +73,12 @@ void TIM2_IRQHandler(void) {
 			TDSC_crossings.collection[TDSC_crossings.length] = TDSC_crossings.crossings;
 			TDSC_crossings.crossings = 0;
 			TDSC_crossings.length++;
-			//GPIO_SetBits(GPIOA, GPIO_Pin_5);
 		}
 		else if (read < 2000 && TDSC_crossings.positive == 1){
 			TDSC_crossings.positive = 0;
 			TDSC_crossings.collection[TDSC_crossings.length] = TDSC_crossings.crossings;
 			TDSC_crossings.crossings = 0;
 			TDSC_crossings.length++;
-			//GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 		}
 		else if (TDSC_crossings.positive && TDSC_positiveMinima()){
 			TDSC_crossings.crossings++;
