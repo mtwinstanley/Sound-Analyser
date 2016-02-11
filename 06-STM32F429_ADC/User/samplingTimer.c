@@ -12,6 +12,7 @@ NVIC_InitTypeDef nvicStructure;
 
 uint32_t ADC_samplingRate;
 extern RCC_ClocksTypeDef clocks; 
+extern uint32_t ADC_read;
 
 /**
   * Name: timer_init
@@ -51,7 +52,9 @@ void samplingTimer_init() {
 	TIM_TimeBaseInit(TIM2, &TIM_timeBaseStructure);
 	// Start count on Timer 2
 	TIM_Cmd(TIM2, ENABLE);
-	
+}
+
+void samplingTimer_NVICInit(){
 	// Generate Update Event
 	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 	
@@ -72,58 +75,10 @@ void samplingTimer_init() {
   * Arguments: void
   * Returns: void  */ 
 void TIM2_IRQHandler(void) {
-	uint32_t read;
-	
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-		read = TM_ADC_Read(ADC1, ADC_Channel_0);
-		TDSC_adjustValues(read);
-		if (read > 2000 && TDSC_crossings.positive == 0){
-			TDSC_crossings.positive = 1;
-			TDSC_crossings.collection[TDSC_crossings.length] = TDSC_crossings.crossings;
-			TDSC_crossings.crossings = 0;
-			TDSC_crossings.length++;
-		}
-		else if (read < 2000 && TDSC_crossings.positive == 1){
-			TDSC_crossings.positive = 0;
-			TDSC_crossings.collection[TDSC_crossings.length] = TDSC_crossings.crossings;
-			TDSC_crossings.crossings = 0;
-			TDSC_crossings.length++;
-		}
-		else if (TDSC_crossings.positive && TDSC_positiveMinima()){
-			TDSC_crossings.crossings++;
-		}
-		else if (!TDSC_crossings.positive && TDSC_negativeMinima()){
-			TDSC_crossings.crossings++;
-		}
+		ADC_read = TM_ADC_Read(ADC1, ADC_Channel_0);
 	}
 }
 
-void TDSC_init(){
-	ADC_values.prev = ADC_values.current = ADC_values.next = 0;
-	TDSC_crossings.crossings = TDSC_crossings.positive = TDSC_crossings.prev = TDSC_crossings.length = 0;
-}
 
-void TDSC_adjustValues(uint16_t adcRead){
-	ADC_values.prev = ADC_values.current;
-	ADC_values.current = ADC_values.next;
-	ADC_values.next = adcRead;
-}
-
-uint8_t TDSC_positiveMinima(){
-	if (ADC_values.current < ADC_values.next && ADC_values.current < ADC_values.prev){
-		return 1;
-	}
-	else{
-		return 0;
-	}
-}
-
-uint8_t TDSC_negativeMinima(){
-	if (ADC_values.current > ADC_values.next && ADC_values.current > ADC_values.prev){
-		return 1;
-	}
-	else{
-		return 0;
-	}
-}

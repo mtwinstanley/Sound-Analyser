@@ -687,6 +687,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\samplingTimer.c</FilePath>
             </File>
+            <File>
+              <FileName>LPFClock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LPFClock.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1407,6 +1412,11 @@
               <FileName>samplingTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\samplingTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>LPFClock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LPFClock.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2129,6 +2139,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\samplingTimer.c</FilePath>
             </File>
+            <File>
+              <FileName>LPFClock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LPFClock.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2849,6 +2864,11 @@
               <FileName>samplingTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\samplingTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>LPFClock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LPFClock.c</FilePath>
             </File>
           </Files>
         </Group>

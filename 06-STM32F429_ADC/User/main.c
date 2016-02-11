@@ -18,10 +18,13 @@
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_adc.h"
 #include "samplingTimer.h"
+#include "TDSC.h"
 #include "LPFClock.h"
 #include <stdio.h>
 
 RCC_ClocksTypeDef clocks;
+uint16_t ADC_read, ADC_previousRead;
+
 int main(void) {
 	char str[15];
 	
@@ -48,26 +51,32 @@ int main(void) {
 	//ADC_samplingRate = 48000;
 	
 	TDSC_init();
-	samplingTimer_init();
 	LPFClock_init();
+	
 	sprintf(str, "START @%d\n\r", SystemCoreClock);
-			/* Put to USART */
-			TM_USART_Puts(USART1, str);
-			
-			//low = TM_ADC_Read(ADC1, ADC_Channel_0);
+	/* Put to USART */
+	TM_USART_Puts(USART1, str);
+	
 	while (1) {
+		
+		if (ADC_read != ADC_previousRead){
+			ADC_previousRead = ADC_read;
+			TDSC_sampleRoutine(ADC_read);
+			sprintf(str, "ADC = %4d\n\r", ADC_read);
+			TM_USART_Puts(USART1, str);
+		}
 		/* 							Read ADC1 Channel0					Read ADC1 Channel3 */
 		//sprintf(str, "%4d\n\r", TM_ADC_Read(ADC1, ADC_Channel_0));//, TM_ADC_Read(ADC1, ADC_Channel_3));
 		//TM_USART_Puts(USART1, str);
-		if (TDSC_crossings.length > 200){
-			int i;
-			for (i = 0; i < TDSC_crossings.length; i++){
-				sprintf(str, "%4d", TDSC_crossings.collection[i]);
-				TM_USART_Puts(USART1, str);
-			}
-				sprintf(str, "\n\r");
-				TM_USART_Puts(USART1, str);
-		}
+//		if (TDSC_crossings.length > 200){
+//			int i;
+//			for (i = 0; i < TDSC_crossings.length; i++){
+//				sprintf(str, "%4d", TDSC_crossings.collection[i]);
+//				TM_USART_Puts(USART1, str);
+//			}
+//				sprintf(str, "\n\r");
+//				TM_USART_Puts(USART1, str);
+//		}
 		
 //		read = TM_ADC_Read(ADC1, ADC_Channel_0);
 //		if (low > read && read != 0){
@@ -86,6 +95,6 @@ int main(void) {
 
 		
 		/* Little delay */
-		Delayms(100);
+//		Delayms(100);
 	}
 }
