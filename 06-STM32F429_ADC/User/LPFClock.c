@@ -1,9 +1,16 @@
+#include <stdio.h>
+#include <math.h>
 #include "samplingTimer.h"
 #include "stm32f4xx_tim.h"
 #include "tm_stm32f4_adc.h"
 #include "tm_stm32f4_usart.h"
 #include "stm32f4xx.h"
-	
+
+#define defaultCutOffFrequency (ADC_samplingRate/2)
+
+uint32_t LPF_cutOffFrequency = 0;
+extern RCC_ClocksTypeDef clocks;
+
 /**
   * Name: LPFClock_init
   * Description: Initialises the timer
@@ -17,6 +24,10 @@ void LPFClock_init() {
 	TIM_TimeBaseInitTypeDef TIM_timeBase;
 	NVIC_InitTypeDef nvic;
 	GPIO_InitTypeDef GPIO_InitDef;
+	
+	if (LPF_cutOffFrequency == 0){
+		LPF_cutOffFrequency = defaultCutOffFrequency;
+	}
 	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);							// Enable Clock for Timer 3
 	/* Timer 5 is connected to APB1, which runs at 42MHz
@@ -41,7 +52,7 @@ void LPFClock_init() {
 		 period = 84MHz / 1.472MHz + 1 = 57 (57.1) + 1
 		 
 	*/
-	TIM_timeBase.TIM_Period = 58;
+	TIM_timeBase.TIM_Period = rint((float) (clocks.PCLK1_Frequency * 2) / (float)(LPF_cutOffFrequency * 32 * 2)) + 1;
 	TIM_timeBase.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_timeBase.TIM_RepetitionCounter = 0;
 	// Initialise Timer 5

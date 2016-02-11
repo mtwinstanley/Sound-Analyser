@@ -21,6 +21,7 @@
 #include "LPFClock.h"
 #include <stdio.h>
 
+RCC_ClocksTypeDef clocks;
 int main(void) {
 	char str[15];
 	
@@ -29,6 +30,9 @@ int main(void) {
 	
 	/* Initialize Delay library */
 	TM_DELAY_Init();
+	
+	/* Get the Clock Frequencies for use in the timer initialisations */
+	RCC_GetClocksFreq(&clocks);
 	
 	/* Initialize USART1, 115200baud, TX: PB6 */
 	TM_USART_Init(USART1, TM_USART_PinsPack_2, 115200);
@@ -39,6 +43,10 @@ int main(void) {
 	/* Initialize ADC1 on channel 3, this is pin PA3 */
 	//TM_ADC_Init(ADC1, ADC_Channel_3);
 
+	/* Option to set the LPF cut off frequency and the ADC_sampling Rate. This should be changed to read from the SD Card */
+	//LPF_cutOffFrequency = 10000;
+	//ADC_samplingRate = 48000;
+	
 	TDSC_init();
 	samplingTimer_init();
 	LPFClock_init();

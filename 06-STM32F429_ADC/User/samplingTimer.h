@@ -20,6 +20,7 @@ typedef struct {
 
 extern ADC_values_t ADC_values;
 extern TDSC_crossings_t TDSC_crossings;
+extern uint32_t ADC_samplingRate;
 
 /* Function Prototypes */
 void samplingTimer_init(void);
