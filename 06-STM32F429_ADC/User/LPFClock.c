@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <math.h>
+#include "LPFClock.h"
 #include "samplingTimer.h"
 #include "stm32f4xx_tim.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_gpio.h"
 #include "tm_stm32f4_adc.h"
 #include "tm_stm32f4_usart.h"
 #include "stm32f4xx.h"
 
 #define defaultCutOffFrequency (ADC_samplingRate/2)
+
+char str[15];
 
 uint32_t LPF_cutOffFrequency = 0;
 extern RCC_ClocksTypeDef clocks;
@@ -14,7 +19,7 @@ extern RCC_ClocksTypeDef clocks;
 /**
   * Name: LPFClock_init
   * Description: Initialises the timer
-  *              This sets the prescaler to divide the APB1 Clock source (84MHz) to give a frequency of 1.46MHz 
+  *              This sets the prescaler to divide the APB1 Clock source (84MHz) to give a frequency related to the LPF cut off frequency 
   *              The interupt bit is set and the interrupt request (IRQ) is enabled 
   *              This was written using the STM32 Family Reference Manual Rev 11 Pages (183-187), (373-390) and (582-641) 
   * Arguments: void
@@ -22,15 +27,16 @@ extern RCC_ClocksTypeDef clocks;
 void LPFClock_init() {
 	// Variable definititions
 	TIM_TimeBaseInitTypeDef TIM_timeBase;
-	NVIC_InitTypeDef nvic;
-	GPIO_InitTypeDef GPIO_InitDef;
 	
-	if (LPF_cutOffFrequency == 0){
+	if (!LPF_cutOffFrequency){
 		LPF_cutOffFrequency = defaultCutOffFrequency;
+		if (!LPF_cutOffFrequency){
+			LPF_cutOffFrequency = 24000;
+		}
 	}
 	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);							// Enable Clock for Timer 3
-	/* Timer 5 is connected to APB1, which runs at 42MHz
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);							// Enable Clock for Timer 3
+	/* Timer 3 is connected to APB1, which runs at 42MHz
 		 Timer has internal PLL, which doubles this to 84MHz for use in the timer
 		 Prescaler is set to give he timer count frequency
 		 tick_frequency = default_frequency / (prescaler + 1)
@@ -52,48 +58,70 @@ void LPFClock_init() {
 		 period = 84MHz / 1.472MHz + 1 = 57 (57.1) + 1
 		 
 	*/
-	TIM_timeBase.TIM_Period = rint((float) (clocks.PCLK1_Frequency * 2) / (float)(LPF_cutOffFrequency * 32 * 2)) + 1;
+	TIM_timeBase.TIM_Period = rint((float) (clocks.PCLK1_Frequency * 2) / (float)(LPF_cutOffFrequency * 32)) + 1;
 	TIM_timeBase.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_timeBase.TIM_RepetitionCounter = 0;
-	// Initialise Timer 5
-	TIM_TimeBaseInit(TIM5, &TIM_timeBase);
-	// Start count on Timer 5
-	TIM_Cmd(TIM5, ENABLE);
+	// Initialise Timer 3
+	TIM_TimeBaseInit(TIM3, &TIM_timeBase);
+	// Start count on Timer 3
+	TIM_Cmd(TIM3, ENABLE);
 	
-	// Generate Update Event
-	TIM_ITConfig(TIM5, TIM_IT_Update, ENABLE);
+	// Initialise the PWM
+	LPFClock_PWMInit(TIM_timeBase.TIM_Period);
+	// Initialise the GPIO pins for the clock output
+	LPFClock_GPIOInit();
 	
-	/* Initialise the timer interupt
+
+}
+
+/**
+  * Name: LPFClock_PWMInit
+  * Description: Initialises the PWM for the timer
+  *              This sets the pulse length of the PWM pin in order to create the desired clock 
+  *              This was written with help from Majerle Tilen with his tutorials at stm32f4-discovery.com
+  * Arguments: uint32_t period 
+  * Returns: void  */ 
+void LPFClock_PWMInit(uint32_t period){
+	TIM_OCInitTypeDef TIM_OCStruct;
+	
+	TIM_OCStruct.TIM_OCMode = TIM_OCMode_PWM2;
+	TIM_OCStruct.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCStruct.TIM_OCPolarity = TIM_OCPolarity_Low;
+	
+	/* Duty Cycle can be determined by a simple equation
+	
+		 pulse_length = ((TIM_Period +1) * DutyCycle) / 100 - 1
 	*/
-	nvic.NVIC_IRQChannel = TIM5_IRQn;
-	nvic.NVIC_IRQChannelPreemptionPriority = 0;
-	nvic.NVIC_IRQChannelSubPriority = 1;
-	nvic.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&nvic);
-	// Set the priority higher than the sampling timer so that it will interrupt the sampling interrupt
-	NVIC_SetPriority(TIM5_IRQn, 5);
+	
+	TIM_OCStruct.TIM_Pulse = ((period + 1) * 50) / 100 - 1;
+	TIM_OC1Init(TIM3, &TIM_OCStruct);
+	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
+	
+}
+
+/**
+  * Name: LPFClock_GPIOInit
+  * Description: Initialises the GPIO Pins for the timer outputs
+  *              This initialises all pins required to output the clock data
+  *              The pins must be initialised with the timers output channels PC6 is Timer 3's Output Channel 1
+  * Arguments: void 
+  * Returns: void  */ 
+void LPFClock_GPIOInit(){
+	GPIO_InitTypeDef GPIO_InitDef;
 	
 	/* Initialise the GPIO pin PE0
 		 This will toggle on each timer tick to generate a clock signal to send to the LPF
 	*/
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	
-	GPIO_InitDef.GPIO_Pin = GPIO_Pin_0;
-	GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT;
+	// Set as Alternating Functions
+	GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM3);
+	
+	GPIO_InitDef.GPIO_Pin = GPIO_Pin_6;
 	GPIO_InitDef.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitDef.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitDef.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitDef.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitDef.GPIO_Speed = GPIO_Speed_100MHz;
 	
-	GPIO_Init(GPIOE, &GPIO_InitDef);
-}
-
-/**
-  * Name: TIM5_IRQHandler
-  * Description: Interrupt handler for Timer 5: Defined in stm32f4xx.s
-  * Arguments: void
-  * Returns: void  */ 
-void TIM5_IRQHandler(void) {
-	if (TIM_GetITStatus(TIM5, TIM_IT_Update) != RESET) {
-		TIM_ClearITPendingBit(TIM5, TIM_IT_Update);
-		GPIO_ToggleBits(GPIOE, GPIO_Pin_0);
-	}
+	GPIO_Init(GPIOC, &GPIO_InitDef);
 }
