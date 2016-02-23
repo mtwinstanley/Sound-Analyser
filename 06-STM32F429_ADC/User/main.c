@@ -47,7 +47,7 @@ int main(void) {
 	//TM_ADC_Init(ADC1, ADC_Channel_3);
 
 	/* Option to set the LPF cut off frequency and the ADC_sampling Rate. This should be changed to read from the SD Card */
-	//LPF_cutOffFrequency = 10000;
+	LPF_cutOffFrequency = 5000;
 	//ADC_samplingRate = 48000;
 	
 	TDSC_init();
@@ -62,8 +62,8 @@ int main(void) {
 		if (ADC_read != ADC_previousRead){
 			ADC_previousRead = ADC_read;
 			TDSC_sampleRoutine(ADC_read);
-			sprintf(str, "ADC = %4d\n\r", ADC_read);
-			TM_USART_Puts(USART1, str);
+			//sprintf(str, "ADC = %4d\n\r", ADC_read);
+			//TM_USART_Puts(USART1, str);
 		}
 		/* 							Read ADC1 Channel0					Read ADC1 Channel3 */
 		//sprintf(str, "%4d\n\r", TM_ADC_Read(ADC1, ADC_Channel_0));//, TM_ADC_Read(ADC1, ADC_Channel_3));
