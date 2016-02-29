@@ -20,14 +20,15 @@
 #include "samplingTimer.h"
 #include "TDSC.h"
 #include "LPFClock.h"
+#include "SDCard.h"
 #include <stdio.h>
 
 RCC_ClocksTypeDef clocks;
 uint16_t ADC_read, ADC_previousRead;
 
 int main(void) {
-	char str[15];
-	
+	char str[20];
+	uint32_t SMatrixTest[28] = {0,0,0,6,0,0,0,8,0,0,0,0,0,14,0,0,0,0,0,20,0,0,0,0,0,0,0,28};
 	/* Initialize system */
 	SystemInit();
 	
@@ -43,12 +44,18 @@ int main(void) {
 	/* Initialize ADC1 on channel 0, this is pin PA0 */
 	TM_ADC_Init(ADC1, ADC_Channel_0);
 	
+	sprintf(str, "****** START *****\n\r");
+	/* Put to USART */
+	TM_USART_Puts(USART1, str);
 	/* Initialize ADC1 on channel 3, this is pin PA3 */
 	//TM_ADC_Init(ADC1, ADC_Channel_3);
 
 	/* Option to set the LPF cut off frequency and the ADC_sampling Rate. This should be changed to read from the SD Card */
-	LPF_cutOffFrequency = 5000;
+	//LPF_cutOffFrequency = 5000;
 	//ADC_samplingRate = 48000;
+	SDCard_readConfig();
+	
+	SDCard_writeData(SMatrix_type, SMatrixTest);
 	
 	TDSC_init();
 	LPFClock_init();
