@@ -5,8 +5,8 @@
 ADC_values_t ADC_values;
 TDSC_crossings_t TDSC_crossings;
 
-volatile uint32_t SMatrix[28] = {0};
-volatile uint32_t AMatrix[28][28] = {0};
+uint32_t SMatrix[codebookSize] = {0};
+uint32_t AMatrix[codebookSize * codebookSize] = {0};
 
 void TDSC_init(){
 	ADC_values.prev = ADC_values.current = ADC_values.next = 0;
@@ -76,9 +76,17 @@ void TDSC_setSMatrixValue(uint8_t code){
 	SMatrix[code - 1] = SMatrix[code-1] + 1; 
 }
 
+uint32_t * getSMatrix(){
+	return SMatrix;
+}
+
 void TDSC_setAMatrixValue(uint8_t code, uint8_t lag){
 	if (code == 0 || lag == 0){
 		return;
 	}
-	AMatrix[code-1][lag-1] = AMatrix[code-1][lag-1] + 1;
+	AMatrix[((code-1) * codebookSize) + (lag-1)] = AMatrix[((code-1) * codebookSize) + (lag-1)] + 1;
+}
+
+uint32_t * getAMatrix(){
+	return AMatrix;
 }

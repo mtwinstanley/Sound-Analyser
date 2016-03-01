@@ -1,7 +1,9 @@
 
 #include "SDCard.h"
+#include "codebook.h"
 #include "tm_stm32f4_fatfs.h"
 #include "tm_stm32f4_usart.h"
+#include <string.h>
 
 /* FATFS related */
 FATFS fatFs;
@@ -40,12 +42,13 @@ void SDCard_extractConfig(){
 	
 }
 
-void SDCard_writeData(data_type type, uint32_t data[]) {
-	char str[512], fileName[14];
+void SDCard_writeData(data_type type, uint32_t data []) {
+	char str[codebookSize * codebookSize * 3] = {0}, fileName[14];
+	char contents[codebookSize * codebookSize * 3] = {0};
 	uint32_t * count;
 	static uint32_t SMatrixCount, AMatrixCount;
-	int i;
-	uint32_t SMatrixTest[28] = {0,0,0,6,0,0,0,8,0,0,0,0,0,14,0,0,0,0,0,20,0,0,0,0,0,0,0,28};
+	uint32_t a[28 * 28];
+	int i, j;
 	
 	if (type == SMatrix_type){
 		sprintf(fileName, "SD:SMatrix.txt");
@@ -56,7 +59,7 @@ void SDCard_writeData(data_type type, uint32_t data[]) {
 		count = &AMatrixCount;
 	}
 	if ((fres = f_mount(&fatFs, "SD:", 0)) == FR_OK){
-		if ((fres = f_open(&file, fileName, FA_READ | FA_WRITE)) == FR_NO_FILE){
+		if ((fres = f_open(&file, fileName, FA_CREATE_ALWAYS | FA_READ | FA_WRITE)) == FR_NO_FILE){
 			fres = f_open(&file, fileName, FA_CREATE_ALWAYS | FA_READ | FA_WRITE);
 		}
 		if (fres != FR_OK){
@@ -66,26 +69,36 @@ void SDCard_writeData(data_type type, uint32_t data[]) {
 		}
 		else {
 			if (type == SMatrix_type){
-				for (i = 0; i < (sizeof(SMatrixTest) / sizeof(SMatrixTest[0])); i++){
-					f_write(&file, &SMatrixTest[i], sizeof(SMatrixTest[i]), count);
-					//sprintf(str, "%u, ", SMatrixTest[i]);
-				/* Put to USART */
-				//TM_USART_Puts(USART1, str);
+				for (i = 0; i < codebookSize; i++){
+					if (i == 0) {
+						sprintf(contents, "%u, ",((uint32_t *)data)[i]);
+					}
+					else if (i == 27) {
+						sprintf(contents, "%s%u\n\r", contents, ((uint32_t *)data)[i]);
+					}
+					else {
+						sprintf(contents, "%s%u, ", contents, ((uint32_t *)data)[i]);
+					}
 				}
-				//f_write(&file, "\n\r", 2, count);
-				
-				sprintf(str, "File Contents:\n\r%s", (char* ) SMatrixTest);
-				/* Put to USART */
-				TM_USART_Puts(USART1, str);
+				f_write(&file, contents, strlen(contents), count);
 			}
 			else if (type == AMatrix_type){
-//				for (int i = 0; i < (sizeof(data) / sizeof(data[0])); i++){
-//					for (int j = 0; j < (sizeof(data) / sizeof(data[0])); j++){
-//						f_write(&file, &data[i][j], sizeof(data[i][j]), count);
+				for (i = 0; i < codebookSize * codebookSize; i++){
+//					if (i == 0) {
+//						sprintf(contents, "%u, ",(data)[i]);
 //					}
-//				}
+//					else if (i % codebookSize - 1 == 0) {
+//						sprintf(contents, "%s%u\n\r", contents, (data)[i]);
+//					}
+//					else {
+						sprintf(contents, "%s%u", contents, (data)[i]);
+//					}
+				}
+				f_write(&file, contents, strlen(contents), count);
 			}
-			
+			//sprintf(str, "File Contents:\n\r%s", contents);
+			/* Put to USART */
+			TM_USART_Puts(USART1, contents);
 			sprintf(str, "Writing is done. Written %d bytes\n\r", *count);
 			TM_USART_Puts(USART1, str);
 			f_close(&file);

@@ -28,7 +28,7 @@ uint16_t ADC_read, ADC_previousRead;
 
 int main(void) {
 	char str[20];
-	uint32_t SMatrixTest[28] = {0,0,0,6,0,0,0,8,0,0,0,0,0,14,0,0,0,0,0,20,0,0,0,0,0,0,0,28};
+	
 	/* Initialize system */
 	SystemInit();
 	
@@ -55,10 +55,10 @@ int main(void) {
 	//ADC_samplingRate = 48000;
 	SDCard_readConfig();
 	
-	SDCard_writeData(SMatrix_type, SMatrixTest);
-	
 	TDSC_init();
 	LPFClock_init();
+	
+	SDCard_writeData(AMatrix_type, getAMatrix());
 	
 	sprintf(str, "START @%d\n\r", SystemCoreClock);
 	/* Put to USART */

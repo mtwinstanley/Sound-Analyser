@@ -25,7 +25,10 @@ void TDSC_sampleRoutine(uint16_t read);
 void TDSC_init(void);
 uint8_t TDSC_positiveMinima(void);
 uint8_t TDSC_negativeMinima(void);
+
 void TDSC_setSMatrixValue(uint8_t code);
 void TDSC_setAMatrixValue(uint8_t code, uint8_t lag);
+uint32_t * getSMatrix(void);
+uint32_t * getAMatrix(void);
 
 #endif /* _TDSC_H */
