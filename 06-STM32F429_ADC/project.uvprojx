@@ -727,6 +727,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\codebook.c</FilePath>
             </File>
+            <File>
+              <FileName>SDCard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SDCard.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1552,6 +1557,11 @@
               <FileName>codebook.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\codebook.c</FilePath>
+            </File>
+            <File>
+              <FileName>SDCard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SDCard.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2379,6 +2389,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\codebook.c</FilePath>
             </File>
+            <File>
+              <FileName>SDCard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SDCard.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3204,6 +3219,11 @@
               <FileName>codebook.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\codebook.c</FilePath>
+            </File>
+            <File>
+              <FileName>SDCard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SDCard.c</FilePath>
             </File>
           </Files>
         </Group>
