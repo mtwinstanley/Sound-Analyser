@@ -40,7 +40,45 @@ void SDCard_readConfig() {
 }
 
 void SDCard_extractConfig(){
+	char str[512];
+	char *str1, *str2, *param, *value;
+	char *saveptr1, *saveptr2;
+	int j;
 	
+	for (j=1, str1 = (char *) SD_Buffer; ; j++, str1 = NULL) {
+		param = strtok_r(str1, ";", &saveptr1);
+		if (param == NULL){
+			break;
+		}
+		for (str2 = param; ; str2 = NULL) {
+			value = strtok_r(str2, " = ", &saveptr2);
+			if (value == NULL) {
+				break;
+			}
+			if (strstr(value, "Cutoff") != NULL){
+				str2 = NULL;
+				value = strtok_r(str2, " = ", &saveptr2);
+				config.LPF_cutOffFrequency = atoi(value);
+			}
+			else if (strstr(value, "Adc_sampling") != NULL){
+				str2 = NULL;
+				value = strtok_r(str2, " = ", &saveptr2);
+				config.ADC_samplingRate = atoi(value);
+			}
+			else if (strstr(value, "Time") != NULL){
+				str2 = NULL;
+				value = strtok_r(str2, " = ", &saveptr2);
+				config.classificationTime = atoi(value) * config.ADC_samplingRate;
+			}
+			sprintf(str, "--> %s\n\r", value);
+			/* Put to USART */
+			TM_USART_Puts(USART1, str);
+		}
+	}
+	
+			sprintf(str, "cut = %u, adc = %u, time = %u\n\r", config.LPF_cutOffFrequency, config.ADC_samplingRate, config.classificationTime);
+			/* Put to USART */
+			TM_USART_Puts(USART1, str);
 }
 
 void SDCard_writeData(data_type type, uint32_t data []) {

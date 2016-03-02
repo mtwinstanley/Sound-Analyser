@@ -57,11 +57,12 @@ int main(void) {
 	//ADC_samplingRate = 48000;
 	config.classificationTime = 30*48000; 
 	SDCard_readConfig();
+	SDCard_extractConfig();
 	
 	TDSC_init();
 	LPFClock_init();
 	
-	SDCard_writeData(AMatrix_type, getAMatrix());
+	//SDCard_writeData(SMatrix_type, getSMatrix());
 	
 	sprintf(str, "START @%d\n\r", SystemCoreClock);
 	/* Put to USART */
