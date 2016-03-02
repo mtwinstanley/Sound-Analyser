@@ -2,6 +2,7 @@
 #include <math.h>
 #include "LPFClock.h"
 #include "samplingTimer.h"
+#include "config.h"
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_gpio.h"
@@ -9,11 +10,10 @@
 #include "tm_stm32f4_usart.h"
 #include "stm32f4xx.h"
 
-#define defaultCutOffFrequency (ADC_samplingRate/2)
+#define defaultCutOffFrequency (config.ADC_samplingRate/2)
 
 char str[15];
 
-uint32_t LPF_cutOffFrequency = 0;
 extern RCC_ClocksTypeDef clocks;
 
 /**
@@ -28,10 +28,10 @@ void LPFClock_init() {
 	// Variable definititions
 	TIM_TimeBaseInitTypeDef TIM_timeBase;
 	
-	if (!LPF_cutOffFrequency){
-		LPF_cutOffFrequency = defaultCutOffFrequency;
-		if (!LPF_cutOffFrequency){
-			LPF_cutOffFrequency = 24000;
+	if (!config.LPF_cutOffFrequency){
+		config.LPF_cutOffFrequency = defaultCutOffFrequency;
+		if (!config.LPF_cutOffFrequency){
+			config.LPF_cutOffFrequency = 24000;
 		}
 	}
 	
@@ -58,7 +58,7 @@ void LPFClock_init() {
 		 period = 84MHz / 1.472MHz + 1 = 57 (57.1) + 1
 		 
 	*/
-	TIM_timeBase.TIM_Period = rint((float) (clocks.PCLK1_Frequency * 2) / (float)(LPF_cutOffFrequency * 32)) + 1;
+	TIM_timeBase.TIM_Period = rint((float) (clocks.PCLK1_Frequency * 2) / (float)(config.LPF_cutOffFrequency * 32)) + 1;
 	TIM_timeBase.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_timeBase.TIM_RepetitionCounter = 0;
 	// Initialise Timer 3

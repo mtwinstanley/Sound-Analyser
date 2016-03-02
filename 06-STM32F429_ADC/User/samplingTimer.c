@@ -1,5 +1,6 @@
 #include <math.h>
 #include "samplingTimer.h"
+#include "config.h"
 #include "stm32f4xx_tim.h"
 #include "tm_stm32f4_adc.h"
 #include "tm_stm32f4_usart.h"
@@ -10,7 +11,6 @@
 TIM_TimeBaseInitTypeDef TIM_timeBaseStructure;
 NVIC_InitTypeDef nvicStructure;
 
-uint32_t ADC_samplingRate;
 extern RCC_ClocksTypeDef clocks; 
 extern uint32_t ADC_read;
 
@@ -24,8 +24,8 @@ extern uint32_t ADC_read;
   * Returns: void  */   
 void samplingTimer_init() {
 	
-	if (ADC_samplingRate == 0){
-		ADC_samplingRate = defaultSamplingRate;
+	if (config.ADC_samplingRate == 0){
+		config.ADC_samplingRate = defaultSamplingRate;
 	}
 		
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);							// Enable Clock for Timer 2
@@ -45,7 +45,7 @@ void samplingTimer_init() {
 		 To get a 48kHz sampling rate: period = 84MHz / 48kHz + 1 = 1751
 		 stored as a value - 1 so that it is easily re-configurable for different sample rates
 	*/
-	TIM_timeBaseStructure.TIM_Period = rint((float) (clocks.PCLK1_Frequency * 2) / (float)(ADC_samplingRate)) + 1; //1751 48kHz
+	TIM_timeBaseStructure.TIM_Period = rint((float) (clocks.PCLK1_Frequency * 2) / (float)(config.ADC_samplingRate)) + 1; //1751 48kHz
 	TIM_timeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_timeBaseStructure.TIM_RepetitionCounter = 0;
 	// Initialise Timer 2

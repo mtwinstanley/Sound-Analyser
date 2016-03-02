@@ -4,7 +4,7 @@
 
 typedef enum {
 	SMatrix_type,
-	AMatrix_type
+	//AMatrix_type
 } data_type;
 
 void SDCard_readConfig(void); 

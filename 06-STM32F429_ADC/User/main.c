@@ -14,6 +14,7 @@
 #include "stm32f4xx.h"
 /* Include my libraries here */
 #include "defines.h"
+#include "config.h"
 #include "tm_stm32f4_delay.h"
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_adc.h"
@@ -23,6 +24,7 @@
 #include "SDCard.h"
 #include <stdio.h>
 
+config_type config;
 RCC_ClocksTypeDef clocks;
 uint16_t ADC_read, ADC_previousRead;
 
@@ -53,6 +55,7 @@ int main(void) {
 	/* Option to set the LPF cut off frequency and the ADC_sampling Rate. This should be changed to read from the SD Card */
 	//LPF_cutOffFrequency = 5000;
 	//ADC_samplingRate = 48000;
+	config.classificationTime = 30*48000; 
 	SDCard_readConfig();
 	
 	TDSC_init();

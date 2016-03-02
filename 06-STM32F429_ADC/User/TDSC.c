@@ -1,9 +1,15 @@
 #include "TDSC.h"
 #include "samplingTimer.h"
 #include "codebook.h"
+#include "config.h"
+#include "tm_stm32f4_usart.h"
+
+
 
 ADC_values_t ADC_values;
 TDSC_crossings_t TDSC_crossings;
+
+uint32_t time = 0;
 
 uint32_t SMatrix[codebookSize] = {0};
 uint32_t AMatrix[codebookSize * codebookSize] = {0};
@@ -16,9 +22,10 @@ void TDSC_init(){
 }
 void TDSC_sampleRoutine(uint16_t read){
 	uint8_t code;
-
+	char str[20];
 	TDSC_adjustValues(read);
 	TDSC_crossings.duration++;
+	time ++;
 	if (read > 2000 && TDSC_crossings.positive == 0){
 		TDSC_crossings.positive = 1;
 		code = codebook_getCode(TDSC_crossings.shape, TDSC_crossings.duration);
@@ -42,6 +49,12 @@ void TDSC_sampleRoutine(uint16_t read){
 	}
 	else if (!TDSC_crossings.positive && TDSC_negativeMinima()){
 		TDSC_crossings.shape++;
+	}
+	if (time == config.classificationTime){
+		time = 0;
+		sprintf(str, "TIME\n\r");
+		/* Put to USART */
+		TM_USART_Puts(USART1, str);
 	}
 }
 

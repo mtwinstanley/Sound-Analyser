@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-extern uint32_t ADC_samplingRate;
 
 /* Function Prototypes */
 void samplingTimer_init(void);
