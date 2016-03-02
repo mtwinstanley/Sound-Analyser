@@ -15,5 +15,5 @@ uint8_t codebook_getCode(uint8_t shape, uint8_t duration){
 	if(shape > 6 || duration > 33){
 		return 0;
 	}
-	return codebook[shape-1][duration-1];
+	return codebook[shape][duration-1];
 }
