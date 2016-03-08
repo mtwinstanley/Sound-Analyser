@@ -17,6 +17,7 @@
 #include "tm_stm32f4_delay.h"
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_adc.h"
+#include "tm_stm32f4_fatfs.h"
 #include "leds.h"
 #include "LPFClock.h"
 #include "TDSC.h"
@@ -56,6 +57,9 @@ int main(void) {
 	//LPF_cutOffFrequency = 5000;
 	//ADC_samplingRate = 48000;
 	//config.classificationTime = 30*48000; 
+	sprintf(str, "SD @%d\n\r", TM_FATFS_CheckCardDetectPin());
+	/* Put to USART */
+	TM_USART_Puts(USART1, str);
 	SDCard_readConfig();
 	SDCard_extractConfig();
 	config.classificationTime = 4800;
