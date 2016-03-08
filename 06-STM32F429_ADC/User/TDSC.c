@@ -3,6 +3,7 @@
 #include "codebook.h"
 #include "config.h"
 #include "tm_stm32f4_usart.h"
+#include "leds.h"
 
 
 
@@ -10,6 +11,7 @@ ADC_values_t ADC_values;
 TDSC_crossings_t TDSC_crossings;
 
 uint32_t time = 0;
+uint32_t count = 0;
 
 uint32_t SMatrix[codebookSize] = {0};
 uint32_t AMatrix[codebookSize * codebookSize] = {0};
@@ -52,9 +54,9 @@ void TDSC_sampleRoutine(uint16_t read){
 	}
 	if (time == config.classificationTime){
 		time = 0;
-		sprintf(str, "TIME\n\r");
-		/* Put to USART */
-		TM_USART_Puts(USART1, str);
+		LED_resetALL();
+		LED_setLED(count);
+		count++;
 	}
 }
 
