@@ -18,8 +18,14 @@ void SDCard_readConfig() {
 
 	if ((fres = f_mount(&fatFs, "SD:", 0)) == FR_OK){
 		if ((fres = f_open(&file, "SD:config.txt", FA_READ | FA_WRITE)) != FR_OK){
-			sprintf(str, "Error Message @%d\n\r", fres);
-			TM_USART_Puts(USART1, str);
+			if (fres == FR_NO_FILE) {
+				sprintf(str, "NO CONFIG FILE AVAILABLE\n\r");
+				TM_USART_Puts(USART1, str);
+			}
+			else {
+				sprintf(str, "Failed to open file. Error: %d\n\r", fres);
+				TM_USART_Puts(USART1, str);
+			}
 		}
 		else {
 			f_read(&file, SD_Buffer, sizeof(SD_Buffer), &count);

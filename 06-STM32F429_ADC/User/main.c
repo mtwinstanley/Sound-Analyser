@@ -14,6 +14,7 @@
 #include "stm32f4xx.h"
 /* Include my libraries here */
 #include "config.h"
+#include "SDCard.h"
 #include "tm_stm32f4_delay.h"
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_adc.h"
@@ -22,7 +23,6 @@
 #include "LPFClock.h"
 #include "TDSC.h"
 #include "samplingTimer.h"
-#include "SDCard.h"
 #include <stdio.h>
 
 config_type config;
@@ -31,6 +31,7 @@ uint16_t ADC_read, ADC_previousRead;
 
 int main(void) {
 	char str[20];
+	uint8_t res;
 	
 	/* Initialize system */
 	SystemInit();
@@ -47,6 +48,8 @@ int main(void) {
 	/* Initialize ADC1 on channel 0, this is pin PA0 */
 	TM_ADC_Init(ADC1, ADC_Channel_0);
 	
+	TM_GPIO_Init(FATFS_USE_DETECT_PIN_PORT, FATFS_USE_DETECT_PIN_PIN, TM_GPIO_Mode_IN, TM_GPIO_OType_PP, TM_GPIO_PuPd_UP, TM_GPIO_Speed_Low);
+	
 	sprintf(str, "****** START *****\n\r");
 	/* Put to USART */
 	TM_USART_Puts(USART1, str);
@@ -56,12 +59,16 @@ int main(void) {
 	/* Option to set the LPF cut off frequency and the ADC_sampling Rate. This should be changed to read from the SD Card */
 	//LPF_cutOffFrequency = 5000;
 	//ADC_samplingRate = 48000;
-	//config.classificationTime = 30*48000; 
-	sprintf(str, "SD @%d\n\r", TM_FATFS_CheckCardDetectPin());
-	/* Put to USART */
-	TM_USART_Puts(USART1, str);
-	SDCard_readConfig();
-	SDCard_extractConfig();
+	//config.classificationTime = 30*48000;
+	if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) == 0) {
+		SDCard_readConfig();
+		SDCard_extractConfig();
+	}
+	else {
+		sprintf(str, "NO SD CARD INSERTED\n\r");
+		TM_USART_Puts(USART1, str);
+	}
+
 	config.classificationTime = 4800;
 	
 	LED_GPIOInit();

@@ -2,6 +2,9 @@
 #define _SDCard_H
 #include <stdint.h>
 
+#define FATFS_SDIO_4BIT         1
+
+#define FATFS_USE_DETECT_PIN            1
 #define FATFS_USE_DETECT_PIN_PORT        	GPIOC
 #define FATFS_USE_DETECT_PIN_PIN        	GPIO_PIN_7
 
