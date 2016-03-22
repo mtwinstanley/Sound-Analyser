@@ -1,9 +1,12 @@
+#include <stdio.h>
+#include <string.h>
 #include "TDSC.h"
 #include "samplingTimer.h"
 #include "codebook.h"
 #include "config.h"
 #include "tm_stm32f4_usart.h"
 #include "leds.h"
+#include "SDCard.h"
 
 
 
@@ -28,7 +31,7 @@ void TDSC_sampleRoutine(uint16_t read){
 	TDSC_adjustValues(read);
 	TDSC_crossings.duration++;
 	time ++;
-	if (read > 2000 && TDSC_crossings.positive == 0){
+	if (read > 2300 && TDSC_crossings.positive == 0){
 		TDSC_crossings.positive = 1;
 		code = codebook_getCode(TDSC_crossings.shape, TDSC_crossings.duration);
 		TDSC_setSMatrixValue(code);
@@ -37,7 +40,7 @@ void TDSC_sampleRoutine(uint16_t read){
 		TDSC_crossings.shape = 0;
 		TDSC_crossings.duration = 0;
 	}
-	else if (read < 2000 && TDSC_crossings.positive == 1){
+	else if (read < 1700 && TDSC_crossings.positive == 1){
 		TDSC_crossings.positive = 0;
 		code = codebook_getCode(TDSC_crossings.shape, TDSC_crossings.duration);
 		TDSC_setSMatrixValue(code);
@@ -54,9 +57,11 @@ void TDSC_sampleRoutine(uint16_t read){
 	}
 	if (time == config.classificationTime){
 		time = 0;
-		LED_resetALL();
-		LED_setLED(count);
-		count++;
+		//LED_resetALL();
+		//LED_setLED(count);
+		//count++;
+		SDCard_writeData(SMatrix_type, SMatrix);
+		memset(SMatrix, 0, codebookSize * sizeof(SMatrix[0]));
 	}
 }
 
