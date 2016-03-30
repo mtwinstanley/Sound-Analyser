@@ -7,6 +7,7 @@
 #include "tm_stm32f4_usart.h"
 #include "leds.h"
 #include "SDCard.h"
+#include "classifier.h"
 
 
 
@@ -28,6 +29,8 @@ void TDSC_init(){
 void TDSC_sampleRoutine(uint16_t read){
 	uint8_t code;
 	char str[20];
+	int i;
+	
 	TDSC_adjustValues(read);
 	TDSC_crossings.duration++;
 	time ++;
@@ -61,7 +64,12 @@ void TDSC_sampleRoutine(uint16_t read){
 		//LED_setLED(count);
 		//count++;
 		SDCard_writeData(SMatrix_type, SMatrix);
+		//for (i=0; i< (codebookSize * codebookSize); i++){
+			
+		//}
+		classifier_decisionTree(SMatrix);
 		memset(SMatrix, 0, codebookSize * sizeof(SMatrix[0]));
+		
 	}
 }
 

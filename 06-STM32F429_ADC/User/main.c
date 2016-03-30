@@ -69,7 +69,7 @@ int main(void) {
 		TM_USART_Puts(USART1, str);
 	}
 
-	//config.classificationTime = 4800;
+	config.classificationTime = 480000;
 	
 	LED_GPIOInit();
 	TDSC_init();
