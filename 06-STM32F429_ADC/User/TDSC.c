@@ -63,11 +63,8 @@ void TDSC_sampleRoutine(uint16_t read){
 		//LED_resetALL();
 		//LED_setLED(count);
 		//count++;
-		SDCard_writeData(SMatrix_type, SMatrix);
-		//for (i=0; i< (codebookSize * codebookSize); i++){
-			
-		//}
 		classifier_decisionTree(SMatrix);
+		SDCard_writeData(SMatrix_type, SMatrix);
 		memset(SMatrix, 0, codebookSize * sizeof(SMatrix[0]));
 		
 	}
