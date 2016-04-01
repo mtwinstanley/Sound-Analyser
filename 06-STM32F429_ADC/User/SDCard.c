@@ -4,6 +4,7 @@
 #include "config.h"
 #include "tm_stm32f4_fatfs.h"
 #include "tm_stm32f4_usart.h"
+#include "tm_stm32f4_rtc.h"
 #include <string.h>
 
 /* FATFS related */
@@ -11,6 +12,9 @@ FATFS fatFs;
 FIL file, fil;
 FRESULT fres;
 uint8_t SD_Buffer[512];
+
+/* RTC */
+//TM_RTC_Time_t datatime;
 
 void SDCard_readConfig() {
 	char str[512];
@@ -91,17 +95,13 @@ void SDCard_writeData(data_type type, uint32_t data []) {
 	char str[codebookSize * codebookSize * 3] = {0}, fileName[14];
 	char contents[codebookSize * codebookSize * 3] = {0};
 	uint32_t * count;
-	static uint32_t SMatrixCount, AMatrixCount;
+	static uint32_t SMatrixCount; //, AMatrixCount;
 	int i;
 	
 	if (type == SMatrix_type){
 		sprintf(fileName, "SD:SMatrix.txt");
 		count = &SMatrixCount;
 	}
-//	else if (type == AMatrix_type){
-//		sprintf(fileName, "SD:AMatrix.txt");
-//		count = &AMatrixCount;
-//	}
 	if ((fres = f_mount(&fatFs, "SD:", 0)) == FR_OK){
 		if ((fres = f_open(&fil, fileName, FA_READ | FA_WRITE)) == FR_NO_FILE){
 			fres = f_open(&fil, fileName, FA_CREATE_ALWAYS | FA_READ | FA_WRITE);
@@ -134,9 +134,9 @@ void SDCard_writeData(data_type type, uint32_t data []) {
 //			}
 			//sprintf(str, "File Contents:\n\r%s", contents);
 			/* Put to USART */
-			TM_USART_Puts(USART1, contents);
+			//TM_USART_Puts(USART1, contents);
 			sprintf(str, "Writing is done. Written %d bytes. Error = %d\n\r", *count, fres);
-			TM_USART_Puts(USART1, str);
+			//TM_USART_Puts(USART1, str);
 			f_close(&fil);
 			f_mount(NULL, "SD:", 1);
 			

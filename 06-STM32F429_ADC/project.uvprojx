@@ -728,6 +728,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\leds.c</FilePath>
             </File>
+            <File>
+              <FileName>classifier.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\classifier.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1557,6 +1562,11 @@
               <FileName>leds.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\leds.c</FilePath>
+            </File>
+            <File>
+              <FileName>classifier.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\classifier.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2388,6 +2398,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\leds.c</FilePath>
             </File>
+            <File>
+              <FileName>classifier.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\classifier.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3217,6 +3232,11 @@
               <FileName>leds.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\leds.c</FilePath>
+            </File>
+            <File>
+              <FileName>classifier.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\classifier.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -19,6 +19,7 @@
 #include "tm_stm32f4_usart.h"
 #include "tm_stm32f4_adc.h"
 #include "tm_stm32f4_fatfs.h"
+#include "tm_stm32f4_rtc.h"
 #include "leds.h"
 #include "LPFClock.h"
 #include "TDSC.h"
@@ -29,9 +30,12 @@ config_type config;
 RCC_ClocksTypeDef clocks;
 uint16_t ADC_read, ADC_previousRead;
 
+/* RTC */
+TM_RTC_Time_t datatime;
+
 int main(void) {
 	char str[20];
-	uint8_t res;
+	uint16_t high = 0, low = 0xFFFF;
 	
 	/* Initialize system */
 	SystemInit();
@@ -49,6 +53,12 @@ int main(void) {
 	TM_ADC_Init(ADC1, ADC_Channel_0);
 	
 	TM_GPIO_Init(FATFS_USE_DETECT_PIN_PORT, FATFS_USE_DETECT_PIN_PIN, TM_GPIO_Mode_IN, TM_GPIO_OType_PP, TM_GPIO_PuPd_UP, TM_GPIO_Speed_Low);
+	
+	if (!TM_RTC_Init(TM_RTC_ClockSource_Internal)) {
+        //RTC was first time initialized
+        //Do your stuf here
+        //eg. set default time
+    }
 	
 	sprintf(str, "****** START *****\n\r");
 	/* Put to USART */
@@ -86,9 +96,29 @@ int main(void) {
 		if (ADC_read != ADC_previousRead){
 			ADC_previousRead = ADC_read;
 			TDSC_sampleRoutine(ADC_read);
-			//sprintf(str, "ADC = %4d\n\r", ADC_read);
-			//TM_USART_Puts(USART1, str);
+			if (ADC_read > high){
+				high = ADC_read;
+				sprintf(str, "high = %4d\n\r", ADC_read);
+				//TM_USART_Puts(USART1, str);
+			}
+			if (ADC_read < low){
+				low = ADC_read;
+				sprintf(str, "low = %4d\n\r", ADC_read);
+				//TM_USART_Puts(USART1, str);
+			}
+			//LED_toggleLED(LED_GREEN_8);
 		}
+		TM_RTC_GetDateTime(&datatime, TM_RTC_Format_BIN);
+			sprintf(str, "%02d.%02d.%04d %02d:%02d:%02d  Unix: %u\n\r",
+                datatime.date,
+                datatime.month,
+                datatime.year + 2000,
+                datatime.hours,
+                datatime.minutes,
+                datatime.seconds,
+                datatime.unix
+			);
+			TM_USART_Puts(USART1, str);
 		
 		/* 							Read ADC1 Channel0					Read ADC1 Channel3 */
 		//sprintf(str, "%4d\n\r", TM_ADC_Read(ADC1, ADC_Channel_0));//, TM_ADC_Read(ADC1, ADC_Channel_3));
