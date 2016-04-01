@@ -15,6 +15,6 @@ typedef enum {
 
 void SDCard_readConfig(void); 
 void SDCard_extractConfig(void);
-void SDCard_writeData(data_type type, uint32_t data[]);
+void SDCard_writeData(data_type type, uint32_t data[], const char *classificationValue);
 
 #endif /* _SDCard_H */

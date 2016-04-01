@@ -14,7 +14,7 @@ FRESULT fres;
 uint8_t SD_Buffer[512];
 
 /* RTC */
-//TM_RTC_Time_t datatime;
+TM_RTC_Time_t datatime;
 
 void SDCard_readConfig() {
 	char str[512];
@@ -91,13 +91,22 @@ void SDCard_extractConfig(){
 			TM_USART_Puts(USART1, str);
 }
 
-void SDCard_writeData(data_type type, uint32_t data []) {
-	char str[codebookSize * codebookSize * 3] = {0}, fileName[14];
+void SDCard_writeData(data_type type, uint32_t data [], const char *classificationValue) {
+	char str[codebookSize * codebookSize * 3] = {0}, fileName[14], time[25];
 	char contents[codebookSize * codebookSize * 3] = {0};
 	uint32_t * count;
 	static uint32_t SMatrixCount; //, AMatrixCount;
 	int i;
 	
+	TM_RTC_GetDateTime(&datatime, TM_RTC_Format_BIN);
+	sprintf(time, "%02d.%02d.%04d %02d:%02d:%02d    ",
+						datatime.date,
+						datatime.month,
+						datatime.year + 2000,
+						datatime.hours,
+						datatime.minutes,
+						datatime.seconds
+	);
 	if (type == SMatrix_type){
 		sprintf(fileName, "SD:SMatrix.txt");
 		count = &SMatrixCount;
@@ -115,7 +124,7 @@ void SDCard_writeData(data_type type, uint32_t data []) {
 			if (type == SMatrix_type){
 				for (i = 0; i < codebookSize; i++){
 					if (i == 0) {
-						sprintf(contents, "%u, ",((uint32_t *)data)[i]);
+						sprintf(contents, "%s%s%u, ", time, classificationValue, ((uint32_t *)data)[i]);
 					}
 					else if (i == 27) {
 						sprintf(contents, "%s%u\n\r", contents, ((uint32_t *)data)[i]);

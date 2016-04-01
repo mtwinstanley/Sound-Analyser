@@ -31,7 +31,7 @@ RCC_ClocksTypeDef clocks;
 uint16_t ADC_read, ADC_previousRead;
 
 /* RTC */
-TM_RTC_Time_t datatime;
+TM_RTC_Time_t datatime1;
 
 int main(void) {
 	char str[20];
@@ -108,15 +108,15 @@ int main(void) {
 			}
 			//LED_toggleLED(LED_GREEN_8);
 		}
-		TM_RTC_GetDateTime(&datatime, TM_RTC_Format_BIN);
+		TM_RTC_GetDateTime(&datatime1, TM_RTC_Format_BIN);
 			sprintf(str, "%02d.%02d.%04d %02d:%02d:%02d  Unix: %u\n\r",
-                datatime.date,
-                datatime.month,
-                datatime.year + 2000,
-                datatime.hours,
-                datatime.minutes,
-                datatime.seconds,
-                datatime.unix
+                datatime1.date,
+                datatime1.month,
+                datatime1.year + 2000,
+                datatime1.hours,
+                datatime1.minutes,
+                datatime1.seconds,
+                datatime1.unix
 			);
 			TM_USART_Puts(USART1, str);
 		

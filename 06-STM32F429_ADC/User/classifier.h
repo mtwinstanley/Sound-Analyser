@@ -4,6 +4,6 @@
 #include <stdint.h>
 
 /* Function Prototypes */
-void classifier_decisionTree(uint32_t SMatrix[]);
+const char * classifier_decisionTree(uint32_t SMatrix[]);
 	
 #endif /* _CLASSIFIER_H */
