@@ -28,8 +28,6 @@ void TDSC_init(){
 }
 void TDSC_sampleRoutine(uint16_t read){
 	uint8_t code;
-	char str[20];
-	int i;
 	
 	TDSC_adjustValues(read);
 	TDSC_crossings.duration++;
@@ -43,7 +41,7 @@ void TDSC_sampleRoutine(uint16_t read){
 		TDSC_crossings.shape = 0;
 		TDSC_crossings.duration = 0;
 	}
-	else if (read < 1700 && TDSC_crossings.positive == 1){
+	else if (read < 2200 && TDSC_crossings.positive == 1){
 		TDSC_crossings.positive = 0;
 		code = codebook_getCode(TDSC_crossings.shape, TDSC_crossings.duration);
 		TDSC_setSMatrixValue(code);
