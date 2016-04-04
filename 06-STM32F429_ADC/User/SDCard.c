@@ -95,6 +95,7 @@ void SDCard_writeData(data_type type, uint32_t data [], const char *classificati
 	char str[codebookSize * codebookSize * 3] = {0}, fileName[14], time[25];
 	char contents[codebookSize * codebookSize * 3] = {0};
 	uint32_t * count;
+	uint32_t cnt;
 	static uint32_t SMatrixCount; //, AMatrixCount;
 	int i;
 	
@@ -115,6 +116,10 @@ void SDCard_writeData(data_type type, uint32_t data [], const char *classificati
 		if ((fres = f_open(&fil, fileName, FA_READ | FA_WRITE)) == FR_NO_FILE){
 			fres = f_open(&fil, fileName, FA_CREATE_ALWAYS | FA_READ | FA_WRITE);
 		}
+		else {
+			f_read(&fil, str, sizeof(str), &cnt);
+			f_lseek(&fil, cnt);
+		}
 		if (fres != FR_OK){
 			sprintf(str, "Error Message @%d\n\r", fres);
 			TM_USART_Puts(USART1, str);
@@ -133,7 +138,8 @@ void SDCard_writeData(data_type type, uint32_t data [], const char *classificati
 						sprintf(contents, "%s%u, ", contents, ((uint32_t *)data)[i]);
 					}
 				}
-				fres = f_write(&fil, contents, strlen(contents), count);
+				//fres = f_write(&fil, contents, strlen(contents), count);
+				fres = f_puts(contents, &fil);
 			}
 //			else if (type == AMatrix_type){
 //				for (i = 0; i < codebookSize * codebookSize; i++){
@@ -143,9 +149,9 @@ void SDCard_writeData(data_type type, uint32_t data [], const char *classificati
 //			}
 			//sprintf(str, "File Contents:\n\r%s", contents);
 			/* Put to USART */
-			//TM_USART_Puts(USART1, contents);
+			TM_USART_Puts(USART1, contents);
 			sprintf(str, "Writing is done. Written %d bytes. Error = %d\n\r", *count, fres);
-			//TM_USART_Puts(USART1, str);
+			TM_USART_Puts(USART1, str);
 			f_close(&fil);
 			f_mount(NULL, "SD:", 1);
 			
