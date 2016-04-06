@@ -16,6 +16,8 @@
 /* Function Prototypes */
 void LED_GPIOInit(void);
 void LED_setLED(uint16_t led);
+void LED_error(void);
+void LED_clearError(void);
 void LED_toggleLED(uint16_t led);
 void LED_resetLED(uint16_t led);
 void LED_resetALL(void );

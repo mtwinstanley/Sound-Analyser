@@ -2,7 +2,7 @@
 #define _USART_H
 
 #include <stdint.h>
-#define TM_USART1_USE_CUSTOM_IRQ	1
+
 
 
 /* Function Prototypes */

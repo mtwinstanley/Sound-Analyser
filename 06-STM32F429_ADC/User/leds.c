@@ -39,6 +39,14 @@ void LED_setLED(uint16_t led){
 	GPIO_SetBits(GPIOE, led);
 }
 
+void LED_error(){
+	GPIO_SetBits(GPIOB, LED_RED);
+}
+
+void LED_clearError(){
+	GPIO_SetBits(GPIOB, LED_RED);
+}
+
 void LED_toggleLED(uint16_t led){
 	GPIO_ToggleBits(GPIOB, led);
 	GPIO_ToggleBits(GPIOE, led);

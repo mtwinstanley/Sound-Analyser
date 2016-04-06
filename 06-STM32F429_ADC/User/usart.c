@@ -38,7 +38,7 @@ void TM_USART1_ReceiveHandler(uint8_t c){
 		if (buffer[0] == 'R' && buffer[1] == 'T' && buffer[2] == 'C'){
 			if (isdigit(buffer[4]) && isdigit(buffer[5]) && !isdigit(buffer[6]) && isdigit(buffer[22])){
 				strncpy(RTC_time, (char *) buffer + 4, sizeof(buffer) - 4);
-				RTC_update = 1;
+				TM_RTC_SetDateTimeString(RTC_time);
 			}
 		}
 		//sprintf(str, "\n\rReceieved %s\n\r", buffer);

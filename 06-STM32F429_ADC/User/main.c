@@ -52,24 +52,23 @@ int main(void) {
 	/* Initialize ADC1 on channel 0, this is pin PA0 */
 	TM_ADC_Init(ADC1, ADC_Channel_0);
 	
+	/* Initialise SD Card Detect Pin */
 	TM_GPIO_Init(FATFS_USE_DETECT_PIN_PORT, FATFS_USE_DETECT_PIN_PIN, TM_GPIO_Mode_IN, TM_GPIO_OType_PP, TM_GPIO_PuPd_UP, TM_GPIO_Speed_Low);
+	SDCard_configureCD();
 	
+	/* Initialise RTC if it is not already initialised */
 	if (!TM_RTC_Init(TM_RTC_ClockSource_Internal)) {
         //RTC was first time initialized
         //Do your stuf here
         //eg. set default time
 				
     }
-	sprintf(str, "****** START *****\n\r");
-	/* Put to USART */
-	TM_USART_Puts(USART1, str);
-	/* Initialize ADC1 on channel 3, this is pin PA3 */
-	//TM_ADC_Init(ADC1, ADC_Channel_3);
 
 	/* Option to set the LPF cut off frequency and the ADC_sampling Rate. This should be changed to read from the SD Card */
 	//LPF_cutOffFrequency = 5000;
 	//ADC_samplingRate = 48000;
 	//config.classificationTime = 30*48000;
+	
 	if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) == 0) {
 		SDCard_readConfig();
 		SDCard_extractConfig();
@@ -78,6 +77,7 @@ int main(void) {
 	else {
 		sprintf(str, "NO SD CARD INSERTED\n\r");
 		TM_USART_Puts(USART1, str);
+		LED_error();
 	}
 
 	config.classificationTime = 480000;
@@ -98,64 +98,10 @@ int main(void) {
 			ADC_previousRead = ADC_read;
 			TDSC_sampleRoutine(ADC_read);
 		}
-		if (RTC_update){
-			TM_RTC_SetDateTimeString(RTC_time);
-			RTC_update = 0;
-		}
-		if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) != 0 && SDCardInserted == 1) {
-			sprintf(str, "NO SD CARD INSERTED\n\r");
-			TM_USART_Puts(USART1, str);
-			SDCardInserted = 0;
-		}
-		if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) == 0 && SDCardInserted == 0) {
-			sprintf(str, "SD CARD INSERTED\n\r");
-			TM_USART_Puts(USART1, str);
-			SDCard_readConfig();
-			SDCard_extractConfig();
-			SDCardInserted = 1;
-		}
-//		TM_RTC_GetDateTime(&datatime1, TM_RTC_Format_BIN);
-//			sprintf(str, "%02d.%02d.%04d %02d:%02d:%02d  Unix: %u\n\r",
-//                datatime1.date,
-//                datatime1.month,
-//                datatime1.year + 2000,
-//                datatime1.hours,
-//                datatime1.minutes,
-//                datatime1.seconds,
-//                datatime1.unix
-//			);
-//			TM_USART_Puts(USART1, str);
-		
-		/* 							Read ADC1 Channel0					Read ADC1 Channel3 */
-		//sprintf(str, "%4d\n\r", TM_ADC_Read(ADC1, ADC_Channel_0));//, TM_ADC_Read(ADC1, ADC_Channel_3));
-		//TM_USART_Puts(USART1, str);
-//		if (TDSC_crossings.length > 200){
-//			int i;
-//			for (i = 0; i < TDSC_crossings.length; i++){
-//				sprintf(str, "%4d", TDSC_crossings.collection[i]);
-//				TM_USART_Puts(USART1, str);
-//			}
-//				sprintf(str, "\n\r");
-//				TM_USART_Puts(USART1, str);
+//		else if (SDRead){
+//			SDCard_readConfig();
+//			SDCard_extractConfig();
+//			SDRead = 0;
 //		}
-		
-//		read = TM_ADC_Read(ADC1, ADC_Channel_0);
-//		if (low > read && read != 0){
-//			low = read;
-//			sprintf(str, "low = %4d\n\r", low);
-//			/* Put to USART */
-//			TM_USART_Puts(USART1, str);
-//		}
-//		if (read > high){
-//			high = read;
-//			sprintf(str, "high = %4d\n\r", high);
-//			/* Put to USART */
-//			TM_USART_Puts(USART1, str);
-//		}
-
-
-		
-		/* Little delay */
-//		Delayms(100);
 	}
 }
