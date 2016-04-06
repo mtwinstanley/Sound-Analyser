@@ -12,6 +12,7 @@ FATFS fatFs;
 FIL file, fil;
 FRESULT fres;
 uint8_t SD_Buffer[512];
+uint8_t SDCardInserted;
 
 /* RTC */
 TM_RTC_Time_t datatime;
@@ -94,72 +95,72 @@ void SDCard_extractConfig(){
 void SDCard_writeData(data_type type, uint32_t data [], const char *classificationValue) {
 	char str[codebookSize * codebookSize * 3] = {0}, fileName[14], time[25];
 	char contents[codebookSize * codebookSize * 3] = {0};
-	uint32_t * count;
+	uint32_t count;
 	uint32_t cnt;
 	static uint32_t SMatrixCount; //, AMatrixCount;
 	int i;
-	
-	TM_RTC_GetDateTime(&datatime, TM_RTC_Format_BIN);
-	sprintf(time, "%02d.%02d.%04d %02d:%02d:%02d    ",
-						datatime.date,
-						datatime.month,
-						datatime.year + 2000,
-						datatime.hours,
-						datatime.minutes,
-						datatime.seconds
-	);
-	if (type == SMatrix_type){
-		sprintf(fileName, "SD:SMatrix.txt");
-		count = &SMatrixCount;
-	}
-	if ((fres = f_mount(&fatFs, "SD:", 0)) == FR_OK){
-		if ((fres = f_open(&fil, fileName, FA_READ | FA_WRITE)) == FR_NO_FILE){
-			fres = f_open(&fil, fileName, FA_CREATE_ALWAYS | FA_READ | FA_WRITE);
+	if (SDCardInserted){
+		TM_RTC_GetDateTime(&datatime, TM_RTC_Format_BIN);
+		sprintf(time, "%02d.%02d.%04d %02d:%02d:%02d    ",
+							datatime.date,
+							datatime.month,
+							datatime.year + 2000,
+							datatime.hours,
+							datatime.minutes,
+							datatime.seconds
+		);
+		if (type == SMatrix_type){
+			sprintf(fileName, "SD:SMatrix.txt");
 		}
-		else {
-			f_read(&fil, str, sizeof(str), &cnt);
-			f_lseek(&fil, cnt);
-		}
-		if (fres != FR_OK){
-			sprintf(str, "Error Message @%d\n\r", fres);
-			TM_USART_Puts(USART1, str);
-			
-		}
-		else {
-			if (type == SMatrix_type){
-				for (i = 0; i < codebookSize; i++){
-					if (i == 0) {
-						sprintf(contents, "%s%s%u, ", time, classificationValue, ((uint32_t *)data)[i]);
-					}
-					else if (i == 27) {
-						sprintf(contents, "%s%u\n\r", contents, ((uint32_t *)data)[i]);
-					}
-					else {
-						sprintf(contents, "%s%u, ", contents, ((uint32_t *)data)[i]);
-					}
-				}
-				//fres = f_write(&fil, contents, strlen(contents), count);
-				fres = f_puts(contents, &fil);
+		if ((fres = f_mount(&fatFs, "SD:", 0)) == FR_OK){
+			if ((fres = f_open(&fil, fileName, FA_READ | FA_WRITE)) == FR_NO_FILE){
+				fres = f_open(&fil, fileName, FA_CREATE_ALWAYS | FA_READ | FA_WRITE);
 			}
-//			else if (type == AMatrix_type){
-//				for (i = 0; i < codebookSize * codebookSize; i++){
-//						sprintf(contents, "%s%u", contents, (data)[i]);
-//				}
-//				fres = f_write(&fil, contents, strlen(contents), count);
-//			}
-			//sprintf(str, "File Contents:\n\r%s", contents);
-			/* Put to USART */
-			TM_USART_Puts(USART1, contents);
-			sprintf(str, "Writing is done. Written %d bytes. Error = %d\n\r", *count, fres);
-			TM_USART_Puts(USART1, str);
-			f_close(&fil);
-			f_mount(NULL, "SD:", 1);
-			
+			else {
+				f_read(&fil, str, sizeof(str), &cnt);
+				f_lseek(&fil, cnt);
+			}
+			if (fres != FR_OK){
+				sprintf(str, "Error Message @%d\n\r", fres);
+				TM_USART_Puts(USART1, str);
+				
+			}
+			else {
+				if (type == SMatrix_type){
+					for (i = 0; i < codebookSize; i++){
+						if (i == 0) {
+							sprintf(contents, "%s%s%u, ", time, classificationValue, ((uint32_t *)data)[i]);
+						}
+						else if (i == 27) {
+							sprintf(contents, "%s%u\n\r", contents, ((uint32_t *)data)[i]);
+						}
+						else {
+							sprintf(contents, "%s%u, ", contents, ((uint32_t *)data)[i]);
+						}
+					}
+					//fres = f_write(&fil, contents, strlen(contents), count);
+					count = f_puts(contents, &fil);
+				}
+	//			else if (type == AMatrix_type){
+	//				for (i = 0; i < codebookSize * codebookSize; i++){
+	//						sprintf(contents, "%s%u", contents, (data)[i]);
+	//				}
+	//				fres = f_write(&fil, contents, strlen(contents), count);
+	//			}
+				//sprintf(str, "File Contents:\n\r%s", contents);
+				/* Put to USART */
+				TM_USART_Puts(USART1, contents);
+				sprintf(str, "Writing is done. Written %d bytes. Error = %d\n\r", count, fres);
+				TM_USART_Puts(USART1, str);
+				f_close(&fil);
+				f_mount(NULL, "SD:", 1);
+				
+			}
 		}
-	}
-	else {
-		sprintf(str, "Error Message @%d\n\r", fres);
-		/* Put to USART */
-		TM_USART_Puts(USART1, str);
+		else {
+			sprintf(str, "Error Message @%d\n\r", fres);
+			/* Put to USART */
+			TM_USART_Puts(USART1, str);
+		}
 	}
 }

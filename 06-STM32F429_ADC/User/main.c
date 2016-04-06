@@ -36,7 +36,6 @@ TM_RTC_Time_t datatime1;
 
 int main(void) {
 	char str[20];
-	uint16_t high = 0, low = 0xFFFF;
 	
 	/* Initialize system */
 	SystemInit();
@@ -59,8 +58,8 @@ int main(void) {
         //RTC was first time initialized
         //Do your stuf here
         //eg. set default time
+				
     }
-	
 	sprintf(str, "****** START *****\n\r");
 	/* Put to USART */
 	TM_USART_Puts(USART1, str);
@@ -74,6 +73,7 @@ int main(void) {
 	if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) == 0) {
 		SDCard_readConfig();
 		SDCard_extractConfig();
+		SDCardInserted = 1;
 	}
 	else {
 		sprintf(str, "NO SD CARD INSERTED\n\r");
@@ -97,21 +97,22 @@ int main(void) {
 		if (ADC_read != ADC_previousRead){
 			ADC_previousRead = ADC_read;
 			TDSC_sampleRoutine(ADC_read);
-			if (ADC_read > high){
-				high = ADC_read;
-				sprintf(str, "high = %4d\n\r", ADC_read);
-				//TM_USART_Puts(USART1, str);
-			}
-			if (ADC_read < low){
-				low = ADC_read;
-				sprintf(str, "low = %4d\n\r", ADC_read);
-				//TM_USART_Puts(USART1, str);
-			}
-			//LED_toggleLED(LED_GREEN_8);
+		}
 		if (RTC_update){
 			TM_RTC_SetDateTimeString(RTC_time);
 			RTC_update = 0;
 		}
+		if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) != 0 && SDCardInserted == 1) {
+			sprintf(str, "NO SD CARD INSERTED\n\r");
+			TM_USART_Puts(USART1, str);
+			SDCardInserted = 0;
+		}
+		if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) == 0 && SDCardInserted == 0) {
+			sprintf(str, "SD CARD INSERTED\n\r");
+			TM_USART_Puts(USART1, str);
+			SDCard_readConfig();
+			SDCard_extractConfig();
+			SDCardInserted = 1;
 		}
 //		TM_RTC_GetDateTime(&datatime1, TM_RTC_Format_BIN);
 //			sprintf(str, "%02d.%02d.%04d %02d:%02d:%02d  Unix: %u\n\r",
