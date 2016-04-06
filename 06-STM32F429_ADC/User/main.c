@@ -24,6 +24,7 @@
 #include "LPFClock.h"
 #include "TDSC.h"
 #include "samplingTimer.h"
+#include "usart.h"
 #include <stdio.h>
 
 config_type config;
@@ -47,7 +48,7 @@ int main(void) {
 	RCC_GetClocksFreq(&clocks);
 	
 	/* Initialize USART1, 115200baud, TX: PB6 */
-	TM_USART_Init(USART1, TM_USART_PinsPack_2, 115200);
+	TM_USART_Init(USART1, TM_USART_PinsPack_Custom, 115200);
 	
 	/* Initialize ADC1 on channel 0, this is pin PA0 */
 	TM_ADC_Init(ADC1, ADC_Channel_0);
@@ -107,6 +108,10 @@ int main(void) {
 				//TM_USART_Puts(USART1, str);
 			}
 			//LED_toggleLED(LED_GREEN_8);
+		if (RTC_update){
+			TM_RTC_SetDateTimeString(RTC_time);
+			RTC_update = 0;
+		}
 		}
 //		TM_RTC_GetDateTime(&datatime1, TM_RTC_Format_BIN);
 //			sprintf(str, "%02d.%02d.%04d %02d:%02d:%02d  Unix: %u\n\r",

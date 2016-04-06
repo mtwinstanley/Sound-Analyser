@@ -431,7 +431,7 @@ uint8_t TM_USART_INT_GetSubPriority(USART_TypeDef* USARTx) {
 	
 #ifdef USE_USART1
 	if (USARTx == USART1) {
-		u = 0;
+		u = 1;
 	}
 #endif
 #ifdef USE_USART2

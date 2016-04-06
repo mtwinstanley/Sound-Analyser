@@ -753,6 +753,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\classifier.c</FilePath>
             </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1607,6 +1612,11 @@
               <FileName>classifier.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\classifier.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\usart.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2463,6 +2473,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\classifier.c</FilePath>
             </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3317,6 +3332,11 @@
               <FileName>classifier.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\classifier.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\usart.c</FilePath>
             </File>
           </Files>
         </Group>
