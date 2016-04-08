@@ -618,6 +618,11 @@
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_pwr.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_syscfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1477,6 +1482,11 @@
               <FileName>stm32f4xx_pwr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_syscfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2338,6 +2348,11 @@
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_pwr.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_syscfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3197,6 +3212,11 @@
               <FileName>stm32f4xx_pwr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32F4xx_STANDARD_PERIPHERAL_DRIVERS\STM32F4xx_StdPeriph_Driver_1.5.1\src\stm32f4xx_syscfg.c</FilePath>
             </File>
           </Files>
         </Group>
