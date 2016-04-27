@@ -26,7 +26,7 @@
 #include "usart.h"
 #include <stdio.h>
 
-/* Clock Frequencies type*/
+/* Clock Frequencies type */
 RCC_ClocksTypeDef clocks;
 
 /* ADC values */
