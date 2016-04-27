@@ -1,3 +1,15 @@
+/**
+ *	ARM-based Real-time Sound Analyser and Classifier
+ *
+ *	This file contains the sampling timer initialisations and interrupt handlers for the ADC
+ *
+ *	@author		Matt Winstanley	
+ *	@email		mle.winstanley@gmail.com
+ *	@ide		Keil uVision 5
+ *	@packs		STM32F4xx Keil packs version 2.2.0 or greater required
+ *	@stdperiph	STM32F4xx Standard peripheral drivers version 1.4.0 or greater required
+ */
+
 #include <math.h>
 #include "samplingTimer.h"
 #include "config.h"
@@ -8,22 +20,28 @@
 
 #define defaultSamplingRate 48000
 
+/* Variable structure definitions */
 TIM_TimeBaseInitTypeDef TIM_timeBaseStructure;
 NVIC_InitTypeDef nvicStructure;
 
+/* Extern Variables from main */
 extern RCC_ClocksTypeDef clocks; 
 extern uint32_t ADC_read;
 
 /**
-  * Name: timer_init
-  * Description: Initialises the timer
-  *              This sets the prescaler to divide the APB1 Clock source (84MHz) to give a frequency of 48kHz 
-  *              The interupt bit is set and the interrupt request (IRQ) is enabled 
-  *              This was written using the STM32 Family Reference Manual Rev 11 Pages (183-187), (373-390) and (582-641) 
-  * Arguments: void
-  * Returns: void  */   
+  * Initialise the sampling timer
+  * Name: samplingTimer_init
+	*
+  * Description: 	Initialises the timer
+  *              	This sets the prescaler to divide the APB1 Clock source (84MHz) to give a frequency of 48kHz (or the sampling rate specified in the cofiguration file) 
+	*
+  * Arguments: 		void
+	*
+  * Returns: 			void  
+	*/   
 void samplingTimer_init() {
 	
+	/* Set default sampling rate if nothing has been set by the SD Card */
 	if (config.ADC_samplingRate == 0){
 		config.ADC_samplingRate = defaultSamplingRate;
 	}
@@ -54,6 +72,17 @@ void samplingTimer_init() {
 	TIM_Cmd(TIM2, ENABLE);
 }
 
+/**
+  * Initialise the Interupt for the sampling timer
+  * Name: samplingTimer_NVICInit
+	*
+  * Description: 	Initialises the timer interrupt
+	*
+  * Arguments: 		void
+	*
+  * Returns: 			void  
+	*/  
+
 void samplingTimer_NVICInit(){
 	// Generate Update Event
 	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
@@ -70,13 +99,20 @@ void samplingTimer_NVICInit(){
 }
 
 /**
+	* Interrupt handler for timer 2
   * Name: TIM2_IRQHandler
+	* 
   * Description: Interrupt handler for Timer 2: Defined in stm32f4xx.s
+	*
   * Arguments: void
-  * Returns: void  */ 
+	*
+  * Returns: void 
+	*/ 
 void TIM2_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
+		// Clear Flag
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+		// Read values from the ADC
 		ADC_read = TM_ADC_Read(ADC1, ADC_Channel_0);
 	}
 }

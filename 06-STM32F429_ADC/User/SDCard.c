@@ -18,6 +18,9 @@ FRESULT fres;
 uint8_t SD_Buffer[512];
 uint8_t SDCardInserted;//, SDRead;
 
+
+config_type config;
+
 /* RTC */
 TM_RTC_Time_t datatime;
 

@@ -1,11 +1,10 @@
 /**
- *	Keil project for ADC peripheral
+ *	ARM-based Real-time Sound Analyser and Classifier
  *
- *  Before you start, select your target, on the right of the "Load" button
+ *	This file contains the main processing loop
  *
- *	@author		Tilen Majerle
- *	@email		tilen@majerle.eu
- *	@website	http://stm32f4-discovery.com
+ *	@author		Matt Winstanley	
+ *	@email		mle.winstanley@gmail.com
  *	@ide		Keil uVision 5
  *	@packs		STM32F4xx Keil packs version 2.2.0 or greater required
  *	@stdperiph	STM32F4xx Standard peripheral drivers version 1.4.0 or greater required
@@ -27,13 +26,26 @@
 #include "usart.h"
 #include <stdio.h>
 
-config_type config;
+/* Clock Frequencies type*/
 RCC_ClocksTypeDef clocks;
+
+/* ADC values */
 uint16_t ADC_read, ADC_previousRead;
 
 /* RTC */
 TM_RTC_Time_t datatime1;
 
+/** 
+	*	Main function 
+	*	Name: main
+	*	
+	* Description: 	Initialises all peripherals and reads configuration data
+	* 							In the main loop, the ADC values are processed
+	*
+	*	Arguments: 		void
+	*
+	*	Returns: 			int - will only return a value if the main processing loop exits
+	*/
 int main(void) {
 	char str[20];
 	
@@ -58,50 +70,38 @@ int main(void) {
 	
 	/* Initialise RTC if it is not already initialised */
 	if (!TM_RTC_Init(TM_RTC_ClockSource_Internal)) {
-        //RTC was first time initialized
-        //Do your stuf here
-        //eg. set default time
-				
+        // If RTC has not been initialised, these functions are called. 
+				// Gives the option to set the time and date to a default value.			
     }
 
-	/* Option to set the LPF cut off frequency and the ADC_sampling Rate. This should be changed to read from the SD Card */
-	//LPF_cutOffFrequency = 5000;
-	//ADC_samplingRate = 48000;
-	//config.classificationTime = 30*48000;
-	
+	/* Detect if an SD card is inserted and read configuration data from the SD card */
 	if ((((FATFS_USE_DETECT_PIN_PORT)->IDR & (FATFS_USE_DETECT_PIN_PIN)) == 0 ? 0 : 1) == 0) {
 		SDCard_readConfig();
 		SDCard_extractConfig();
 		SDCardInserted = 1;
 	}
+	/* If no SD card is inserted, alert the user through USART and by lighting an LED */
 	else {
 		sprintf(str, "NO SD CARD INSERTED\n\r");
 		TM_USART_Puts(USART1, str);
 		LED_error();
 	}
-
-	config.classificationTime = 480000;
 	
+	/* Initialisation Functions */ 
 	LED_GPIOInit();
 	TDSC_init();
 	LPFClock_init();
 	
-	//SDCard_writeData(SMatrix_type, getSMatrix());
-	
+	/* Print start message */
 	sprintf(str, "START @%d\n\r", SystemCoreClock);
-	/* Put to USART */
 	TM_USART_Puts(USART1, str);
 	
 	while (1) {
 		
+		/* Detect changes in the ADC value and process data */
 		if (ADC_read != ADC_previousRead){
 			ADC_previousRead = ADC_read;
 			TDSC_sampleRoutine(ADC_read);
 		}
-//		else if (SDRead){
-//			SDCard_readConfig();
-//			SDCard_extractConfig();
-//			SDRead = 0;
-//		}
 	}
 }

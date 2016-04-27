@@ -1,3 +1,14 @@
+/**
+ *	ARM-based Real-time Sound Analyser and Classifier
+ *
+ *	This file contains the Time Domain Signal Coding (TDSC) Algorithm
+ *
+ *	@author		Matt Winstanley	
+ *	@email		mle.winstanley@gmail.com
+ *	@ide		Keil uVision 5
+ *	@packs		STM32F4xx Keil packs version 2.2.0 or greater required
+ *	@stdperiph	STM32F4xx Standard peripheral drivers version 1.4.0 or greater required
+ */
 #include <stdio.h>
 #include <string.h>
 #include "TDSC.h"
@@ -9,23 +20,46 @@
 #include "SDCard.h"
 #include "classifier.h"
 
-
-
+// Variable Structures
 ADC_values_t ADC_values;
 TDSC_crossings_t TDSC_crossings;
 
+// Time since last classification
 uint32_t time = 0;
-uint32_t count = 0;
 
+// TDSC Matrices
 uint32_t SMatrix[codebookSize] = {0};
 uint32_t AMatrix[codebookSize * codebookSize] = {0};
 
+/** 
+	*	Initialise variables and call sampling timer initialisation functions
+	*	Name: TDSC_init
+	*	
+	* Description: 	Initialises ADC and TDSC values to zero
+	*								Calls the functions to initialise the sampling timer
+	*
+	*	Arguments: 		void
+	*
+	*	Returns: 			void
+	*/
 void TDSC_init(){
 	ADC_values.prev = ADC_values.current = ADC_values.next = 0;
 	TDSC_crossings.shape = TDSC_crossings.positive = TDSC_crossings.lagCode = 0;
 	samplingTimer_init();
 	samplingTimer_NVICInit();
 }
+
+/** 
+	*	Main processing for TDSC algorithm
+	*	Name: TDSC_sampleRoutine
+	*	
+	* Description: 	Takes an input sample from the   
+	*								Calls the functions to initialise the sampling timer
+	*
+	*	Arguments: 		void
+	*
+	*	Returns: 			void
+	*/
 void TDSC_sampleRoutine(uint16_t read){
 	uint8_t code;
 	const char * classificationValue;

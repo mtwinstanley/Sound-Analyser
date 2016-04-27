@@ -18,7 +18,7 @@ if (SMatrix[3] > SMatrix[5] && SMatrix[3] > SMatrix[4] && SMatrix[3] > SMatrix[2
 		sprintf(str, "FL\n\r");
 		c = "FL    ";
 	}
-	else if (SMatrix[5] >  3 * SMatrix[2] && SMatrix[2] > SMatrix[6] && SMatrix[9] > SMatrix[8] && SMatrix[3] > 2*SMatrix[2]){
+	else if (SMatrix[5] >  3 * SMatrix[2] && SMatrix[2] > SMatrix[6] && SMatrix[3] > 2*SMatrix[2]){
 		LED_setLED(LED_GREEN_3);
 		sprintf(str, "JP\n\r");
 		c = "JP    ";

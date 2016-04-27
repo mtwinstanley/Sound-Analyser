@@ -1,3 +1,15 @@
+/**
+ *	ARM-based Real-time Sound Analyser and Classifier
+ *
+ *	This file contains the initialisation functions for the LPF clock
+ *
+ *	@author		Matt Winstanley	
+ *	@email		mle.winstanley@gmail.com
+ *	@ide		Keil uVision 5
+ *	@packs		STM32F4xx Keil packs version 2.2.0 or greater required
+ *	@stdperiph	STM32F4xx Standard peripheral drivers version 1.4.0 or greater required
+ */
+
 #include <stdio.h>
 #include <math.h>
 #include "LPFClock.h"
@@ -12,22 +24,26 @@
 
 #define defaultCutOffFrequency (config.ADC_samplingRate/2)
 
-char str[15];
-
+/* Clock Frequencies type declared in main.c */
 extern RCC_ClocksTypeDef clocks;
 
 /**
+	* Initialise LPF Clock
   * Name: LPFClock_init
+	*
   * Description: Initialises the timer
   *              This sets the prescaler to divide the APB1 Clock source (84MHz) to give a frequency related to the LPF cut off frequency 
-  *              The interupt bit is set and the interrupt request (IRQ) is enabled 
-  *              This was written using the STM32 Family Reference Manual Rev 11 Pages (183-187), (373-390) and (582-641) 
+  *              The timer is initialised to use PWM so that it will produce a clock source without requiring an interrupt or polling source
+	*
   * Arguments: void
-  * Returns: void  */   
+  *
+	* Returns: void  
+	*/   
 void LPFClock_init() {
 	// Variable definititions
 	TIM_TimeBaseInitTypeDef TIM_timeBase;
 	
+	// Load defaults if no cut off frequency is set
 	if (!config.LPF_cutOffFrequency){
 		config.LPF_cutOffFrequency = defaultCutOffFrequency;
 		if (!config.LPF_cutOffFrequency){
@@ -70,17 +86,20 @@ void LPFClock_init() {
 	LPFClock_PWMInit(TIM_timeBase.TIM_Period);
 	// Initialise the GPIO pins for the clock output
 	LPFClock_GPIOInit();
-	
-
 }
 
 /**
+	* Initialise the Pulse Width Modulation
   * Name: LPFClock_PWMInit
+	*
   * Description: Initialises the PWM for the timer
   *              This sets the pulse length of the PWM pin in order to create the desired clock 
   *              This was written with help from Majerle Tilen with his tutorials at stm32f4-discovery.com
+	*
   * Arguments: uint32_t period 
-  * Returns: void  */ 
+	* 
+  * Returns: void  
+	*/ 
 void LPFClock_PWMInit(uint32_t period){
 	TIM_OCInitTypeDef TIM_OCStruct;
 	
@@ -100,16 +119,21 @@ void LPFClock_PWMInit(uint32_t period){
 }
 
 /**
+	* Initialise output pin
   * Name: LPFClock_GPIOInit
+	*
   * Description: Initialises the GPIO Pins for the timer outputs
   *              This initialises all pins required to output the clock data
   *              The pins must be initialised with the timers output channels PC6 is Timer 3's Output Channel 1
+	*
   * Arguments: void 
-  * Returns: void  */ 
+	*
+  * Returns: void  
+	*/ 
 void LPFClock_GPIOInit(){
 	GPIO_InitTypeDef GPIO_InitDef;
 	
-	/* Initialise the GPIO pin PE0
+	/* Initialise the GPIO pin PC6
 		 This will toggle on each timer tick to generate a clock signal to send to the LPF
 	*/
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -123,5 +147,6 @@ void LPFClock_GPIOInit(){
 	GPIO_InitDef.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitDef.GPIO_Speed = GPIO_Speed_100MHz;
 	
+	// Initialise Pin
 	GPIO_Init(GPIOC, &GPIO_InitDef);
 }
