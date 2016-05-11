@@ -3,6 +3,7 @@
  *
  *	This file contains the configuration structure data
  *
+ *  @file		config.h
  *	@author		Matt Winstanley	
  *	@email		mle.winstanley@gmail.com
  *	@ide		Keil uVision 5
@@ -18,9 +19,9 @@
 /* Configuration data structure */
 
 typedef struct {
-	uint32_t ADC_samplingRate;
-	uint32_t LPF_cutOffFrequency;
-	uint32_t classificationTime;
+  uint32_t ADC_samplingRate;
+  uint32_t LPF_cutOffFrequency;
+  uint32_t classificationTime;
 }config_type;
 
 extern config_type config;

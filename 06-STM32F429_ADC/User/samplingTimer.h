@@ -3,6 +3,7 @@
  *
  *	This file contains the sampling timer prototype functions
  *
+ *  @file		samplingTimer.h
  *	@author		Matt Winstanley	
  *	@email		mle.winstanley@gmail.com
  *	@ide		Keil uVision 5

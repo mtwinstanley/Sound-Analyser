@@ -1,6 +1,20 @@
+/**
+ *	ARM-based Real-time Sound Analyser and Classifier
+ *
+ *	This file contains the function prototypes for the LPF clock
+ *
+ *  @file		leds.h
+ *	@author		Matt Winstanley	
+ *	@email		mle.winstanley@gmail.com
+ *	@ide		Keil uVision 5
+ *	@packs		STM32F4xx Keil packs version 2.2.0 or greater required
+ *	@stdperiph	STM32F4xx Standard peripheral drivers version 1.4.0 or greater required
+ */
+ 
 #ifndef _LEDS_H
 #define _LEDS_H
 
+/* Global definition of the LED pins */
 #define LED_GREEN_1 GPIO_Pin_0
 #define LED_GREEN_2 GPIO_Pin_1
 #define LED_GREEN_3 GPIO_Pin_2

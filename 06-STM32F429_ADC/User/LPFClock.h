@@ -3,6 +3,7 @@
  *
  *	This file contains the function prototypes for the LPF clock
  *
+ *  @file		LPFClock.h
  *	@author		Matt Winstanley	
  *	@email		mle.winstanley@gmail.com
  *	@ide		Keil uVision 5
