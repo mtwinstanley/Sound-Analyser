@@ -64,7 +64,6 @@ void TDSC_init(){
   * Returns:   void  
   */ 
 void TDSC_sampleRoutine(uint16_t read){
-  uint8_t code;
   const char * classificationValue;
 	
   TDSC_adjustValues(read);
@@ -130,6 +129,7 @@ void TDSC_adjustValues(uint16_t adcRead){
   * Returns:   void  
   */ 
 void TDSC_processSDpair(){
+  uint8_t code;
   /* Extract code */
   code = codebook_getCode(TDSC_crossings.shape, TDSC_crossings.duration);
   /* S and A Matrices populated*/
